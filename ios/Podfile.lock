@@ -316,6 +316,12 @@ PODS:
   - React-jsinspector (0.69.6)
   - React-logger (0.69.6):
     - glog
+  - react-native-safe-area-context (4.3.1):
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - ReactCommon/turbomodule/core
   - react-native-steerpath-smart-map (1.17.2):
     - React
     - SteerpathSmartSDK (~> 1.15.14)
@@ -387,6 +393,9 @@ PODS:
     - React-perflogger (= 0.69.6)
   - RNFS (2.20.0):
     - React-Core
+  - RNScreens (3.15.0):
+    - React-Core
+    - React-RCTImage
   - Steerpath-Map-SDK (1.1.24)
   - SteerpathSmartSDK (1.15.14):
     - Steerpath-Map-SDK (= 1.1.24)
@@ -429,6 +438,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-steerpath-smart-map (from `../node_modules/react-native-steerpath-smart-map`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -443,6 +453,7 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNFS (from `../node_modules/react-native-fs`)
+  - RNScreens (from `../node_modules/react-native-screens`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -524,6 +535,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   react-native-steerpath-smart-map:
     :path: "../node_modules/react-native-steerpath-smart-map"
   React-perflogger:
@@ -552,6 +565,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNFS:
     :path: "../node_modules/react-native-fs"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -592,6 +607,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: c61b60de03b3474e5749b8a8fd8e6507630d62c4
   React-jsinspector: eaacb698c5af7a99131bc1933806372c20222dfd
   React-logger: ebb4d31bbbe4f1a8a1a9b658d7429210b8f68160
+  react-native-safe-area-context: 6c12e3859b6f27b25de4fee8201cfb858432d8de
   react-native-steerpath-smart-map: 5923fff5b35f43bcc09cf8e315ec1d001537f62a
   React-perflogger: 1fb1ad5333b43a5137afd7608695f7a42c5efd27
   React-RCTActionSheet: a435bd67689433575a1e5d7614b021d2c17f0726
@@ -606,6 +622,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 0af71c94f968fa10015bf0119951bccd2e4d8865
   ReactCommon: fe7580b9d10f00249facf25659e0ec051320cc8a
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
+  RNScreens: 4a1af06327774490d97342c00aee0c2bafb497b7
   Steerpath-Map-SDK: 74bb2298b82a9cb325aaca43d15aed7f056fa989
   SteerpathSmartSDK: 94ca67ab9a72b45ea147edd0bd8e0f6a64025f38
   Yoga: 75bf4b0131cfb46a659cd0c13309b79a6fcff66d
