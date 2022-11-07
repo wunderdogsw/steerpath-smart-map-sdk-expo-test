@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React, { Component, RefObject } from "react";
 import {
   Button,
@@ -31,16 +32,17 @@ interface State {
   mapboxSDKVersion: string;
 }
 
-const floorIndex = 2;
-
 export default class Drawer extends Component<Props, State> {
   liveEnabled = false;
+
   buildingRef = "431";
+
   hasListener = false;
+
   markerMapObject: SmartMapObject = {
     latitude: 60.22094105045167,
     longitude: 24.812373965978622,
-    floorIndex: floorIndex,
+    floorIndex: 2,
     localRef: "custom_marker_local_ref",
     buildingRef: this.buildingRef,
     title: "Custom Marker",
@@ -52,8 +54,9 @@ export default class Drawer extends Component<Props, State> {
     },
     source: SmartObjectSource.MARKER
   };
-  mapMarkers = [];
+
   markerMapObjects: SmartMapObject[] = [];
+
   markerData = {
     type: "FeatureCollection",
     features: [
@@ -61,7 +64,7 @@ export default class Drawer extends Component<Props, State> {
         type: "Feature",
         properties: {
           buildingRef: this.buildingRef,
-          layerIndex: floorIndex,
+          layerIndex: 2,
           localRef: "marker-1",
           title: "R&D"
         },
@@ -74,7 +77,7 @@ export default class Drawer extends Component<Props, State> {
         type: "Feature",
         properties: {
           buildingRef: this.buildingRef,
-          layerIndex: floorIndex,
+          layerIndex: 2,
           localRef: "marker-2",
           title: "Meeting Room"
         },
@@ -87,7 +90,7 @@ export default class Drawer extends Component<Props, State> {
         type: "Feature",
         properties: {
           buildingRef: this.buildingRef,
-          layerIndex: floorIndex,
+          layerIndex: 2,
           localRef: "marker-3",
           title: "Lounge"
         },
@@ -98,7 +101,7 @@ export default class Drawer extends Component<Props, State> {
       }
     ]
   };
-  padding = [];
+
   mapMode = SmartMapMode.SEARCH;
 
   constructor(props: Props) {
@@ -116,6 +119,379 @@ export default class Drawer extends Component<Props, State> {
         this.setState({ smartSDKVersion, mapboxSDKVersion });
       });
     }
+  }
+
+  getCurrentUserTask = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.getCurrentUserTask(
+      this.getUserTaskResponseBlock
+    );
+  };
+
+  getMapObject = (source: SmartObjectSource) => {
+    const { smartMapRef } = this.props;
+    let localRef = "";
+    switch (source) {
+      case "STATIC":
+        localRef = "R&D";
+        smartMapRef.current?.getMapObject(
+          localRef,
+          this.buildingRef,
+          source,
+          this.getMapObjectCompletionBlock
+        );
+        break;
+      case "MARKER":
+        localRef = "custom_marker_local_ref";
+        smartMapRef.current?.getMapObject(
+          localRef,
+          this.buildingRef,
+          source,
+          this.getMapObjectCompletionBlock
+        );
+        break;
+      default:
+        break;
+    }
+  };
+
+  getMapObjectByProperties = () => {
+    const { smartMapRef } = this.props;
+    const title = "Lounge";
+    const properties = {
+      buildingRef: this.buildingRef,
+      title
+    };
+    smartMapRef.current?.getMapObjectByProperties(
+      properties,
+      this.getMapObjectCompletionBlock
+    );
+  };
+
+  getMapObjectCompletionBlock(mapObject: SmartMapObject | null) {
+    // eslint-disable-next-line no-console
+    console.log("this.getMapObjectCompletionBlock", mapObject);
+  }
+
+  getUserTaskResponseBlock(userTaskResponse: SmartMapUserTaskResponse | null) {
+    // eslint-disable-next-line no-console
+    console.log("this.getUserTaskResponseBlock", userTaskResponse);
+  }
+
+  cancelUserTask = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.cancelCurrentUserTask();
+  };
+
+  startUserTask = (userTask: SmartMapUserTaskType) => {
+    const { selectedMapObject, smartMapRef } = this.props;
+    if (userTask === SmartMapUserTaskType.POI_SELECTION) {
+      // either get by properties or by localRef + buildingRef
+      smartMapRef.current?.getMapObjectByProperties(
+        { title: "R&D" },
+        (data) => {
+          // eslint-disable-next-line no-console
+          console.log("data ", data);
+          if (data) {
+            const addMarker = true;
+            const actionButtonText = "Book a room";
+            const actionButtonIcon = "ic_sp_category_fun";
+            const task = {
+              type: SmartMapUserTaskType.POI_SELECTION,
+              payload: {
+                addMarker,
+                actionButtonText,
+                actionButtonIcon,
+                smartMapObject: data,
+                shouldAddMarker: true
+              }
+            };
+            smartMapRef.current?.startUserTask(task);
+          }
+        }
+      );
+    } else {
+      // eslint-disable-next-line no-console
+      console.log("obj", selectedMapObject);
+      if (selectedMapObject) {
+        const task = {
+          type: SmartMapUserTaskType.NAVIGATION,
+          payload: selectedMapObject
+        };
+
+        smartMapRef.current?.startUserTask(task);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log("object is null");
+      }
+    }
+  };
+
+  setCamera = (type: "location" | "object" | "building") => {
+    const { smartMapRef } = this.props;
+    const localRef = "Mobile development";
+    const cameraOptions = {
+      latitude: 60.220945577091356,
+      longitude: 24.812374723580888,
+      zoomLevel: 17,
+      bearing: 30,
+      pitch: 45,
+      floorIndex: 2,
+      buildingRef: this.buildingRef
+    };
+    if (type === "location") {
+      smartMapRef.current?.setCamera(cameraOptions);
+    } else if (type === "object") {
+      smartMapRef.current?.setCameraToObject(
+        localRef,
+        this.buildingRef,
+        21,
+        this.cameraCompletionBlock
+      );
+    } else if (type === "building") {
+      smartMapRef.current?.setCameraToBuildingRef(
+        this.buildingRef,
+        this.cameraCompletionBlock
+      );
+    }
+  };
+
+  animateCamera = (type: "location" | "object" | "building") => {
+    const { smartMapRef } = this.props;
+    const localRef = "Mobile development";
+    const cameraOptions = {
+      latitude: 60.220945577091356,
+      longitude: 24.812374723580888,
+      zoomLevel: 17,
+      bearing: 30,
+      pitch: 45,
+      floorIndex: 2,
+      buildingRef: this.buildingRef
+    };
+
+    if (type === "location") {
+      smartMapRef.current?.animateCamera(cameraOptions);
+    } else if (type === "object") {
+      smartMapRef.current?.animateCameraToObject(
+        localRef,
+        this.buildingRef,
+        21,
+        this.cameraCompletionBlock
+      );
+    } else if (type === "building") {
+      smartMapRef.current?.animateCameraToBuildingRef(
+        this.buildingRef,
+        this.cameraCompletionBlock
+      );
+    }
+  };
+
+  addMarker = () => {
+    const { smartMapRef } = this.props;
+
+    // eslint-disable-next-line no-console
+    console.log("this.markerMapObject ", this.markerMapObject);
+
+    // Either add the this.markerMapObject without the layout options
+    // this.props.smartMapRef.addMarker(this.markerMapObject)
+    // or set the layout options.
+    let markerIcon = "category_marker";
+    if (Platform.OS === "android") {
+      markerIcon = "ic_sp_category_marker";
+    }
+
+    smartMapRef.current?.addMarker(
+      this.markerMapObject,
+      Layout.BOTTOM,
+      markerIcon,
+      "#ff2f92",
+      "#fff"
+    );
+  };
+
+  removeMarker = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.removeMarker(this.markerMapObject);
+  };
+
+  addMarkers = () => {
+    const { smartMapRef } = this.props;
+
+    for (let i = 0; i < this.markerData.features.length; i += 1) {
+      const eachMarker = this.markerData.features[i];
+      const latitude = eachMarker.geometry.coordinates[1];
+      const longitude = eachMarker.geometry.coordinates[0];
+      const floorIndex = eachMarker.properties.layerIndex;
+      const {buildingRef} = eachMarker.properties;
+      const {localRef} = eachMarker.properties;
+      const {title} = eachMarker.properties;
+
+      const eachSmartObject: SmartMapObject = {
+        latitude,
+        longitude,
+        floorIndex,
+        localRef,
+        buildingRef,
+        title,
+        properties: {
+          buildingRef: "",
+          css_class: "",
+          layerIndex: 1,
+          title: "Custom title"
+        },
+        source: SmartObjectSource.MARKER
+      };
+
+      this.markerMapObjects.push(eachSmartObject);
+    }
+
+    smartMapRef.current?.addMarkers(
+      this.markerMapObjects,
+      Layout.BOTTOM,
+      "category_marker_pink",
+      "#ff2f92",
+      "#fff"
+    );
+  };
+
+  removeMarkers = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.removeMarkers(this.markerMapObjects);
+  };
+
+  removeAllMarkers = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.removeAllMarkers();
+  };
+
+  selectMapObject = () => {
+    const { smartMapRef } = this.props;
+
+    const mapObject: SmartMapObject = {
+      localRef: "Lounge",
+      buildingRef: this.buildingRef,
+      /* added start */
+      latitude: 60.220945577091356,
+      longitude: 24.812374723580888,
+      floorIndex: 2,
+      title: "Custom title",
+      properties: {
+        buildingRef: "",
+        css_class: "",
+        layerIndex: 1,
+        title: "Custom title"
+      },
+      source: SmartObjectSource.MARKER
+      /* added end */
+    };
+
+    smartMapRef.current?.selectMapObject(mapObject);
+  };
+
+  addGeofence = () => {
+    const localRef = "R&D";
+    if (this.hasListener === false) {
+      SmartGeofenceManager.addListener(this.handleGeofenceEntered);
+      this.hasListener = true;
+    }
+    SmartGeofenceManager.addGeofence(
+      localRef,
+      this.buildingRef,
+      (error, response) => {
+        if (error) {
+          // eslint-disable-next-line no-console
+          console.error("ERROR: SmartGeofenceManager.addGeofence", error);
+        } else {
+          // eslint-disable-next-line no-console
+          console.log("SmartGeofenceManager.addGeofence", response);
+        }
+      }
+    );
+  };
+
+  handleGeofenceEntered = (eventName: string, data: Record<string, string>) => {
+    // eslint-disable-next-line no-console
+    console.log("handleGeofenceEntered ", eventName, data);
+  };
+
+  setWidgetPadding = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.setWidgetPadding(0, 0, 0, 150);
+  };
+
+  getWidgetPadding = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.getWidgetPadding((padding) => {
+      // eslint-disable-next-line no-console
+      console.log("getPadding", padding);
+    });
+  };
+
+  resetWidgetPadding = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.setWidgetPadding(0, 0, 0, 0);
+  };
+
+  setGeoJson = () => {
+    const { smartMapRef } = this.props;
+
+    const json = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [24.8124114, 60.2209866]
+          },
+          properties: {
+            iconImage: "category_marker",
+            title: "Mobile development",
+            css_class: "",
+            localRef: "Mobile development",
+            layerIndex: 2,
+            buildingRef: "431",
+            id: ""
+          }
+        }
+      ]
+    };
+
+    // eslint-disable-next-line no-console
+    console.log("setGeoJson called");
+    smartMapRef.current?.setGeoJson("marker", json, (response) => {
+      // eslint-disable-next-line no-console
+      console.log("setGeoJson", response);
+    });
+  };
+
+  toggleMapMode = () => {
+    const { smartMapRef } = this.props;
+
+    if (this.mapMode === SmartMapMode.SEARCH) {
+      smartMapRef.current?.setMapMode(SmartMapMode.MAP_ONLY);
+      this.mapMode = SmartMapMode.MAP_ONLY;
+    } else {
+      smartMapRef.current?.setMapMode(SmartMapMode.SEARCH);
+      this.mapMode = SmartMapMode.SEARCH;
+    }
+  };
+
+  clearGeoJson = () => {
+    const { smartMapRef } = this.props;
+    smartMapRef.current?.setGeoJson("marker", null, (response) => {
+      // eslint-disable-next-line no-console
+      console.log("clearGeoJson", response);
+    });
+  };
+
+  setLanguage = (languageCode: "en-GB" | "fi-FI" | "sv-SE" | "nb-NO") => () => {
+    SmartMapManager.setLanguage(languageCode);
+  };
+
+  cameraCompletionBlock(response: MapResponse) {
+    // eslint-disable-next-line no-console
+    console.log("this.cameraCompletionBlock", response);
   }
 
   startLive() {
@@ -144,345 +520,16 @@ export default class Drawer extends Component<Props, State> {
     this.liveEnabled = !this.liveEnabled;
   }
 
-  startUserTask = (userTask: SmartMapUserTaskType) => {
-    if (userTask === SmartMapUserTaskType.POI_SELECTION) {
-      //either get by properties or by localRef + buildingRef
-      this.props.smartMapRef.current?.getMapObjectByProperties(
-        { title: "R&D" },
-        (data) => {
-          console.log("data ", data);
-          if (data) {
-            let addMarker = true;
-            let actionButtonText = "Book a room";
-            let actionButtonIcon = "ic_sp_category_fun";
-            let userTask = {
-              type: SmartMapUserTaskType.POI_SELECTION,
-              payload: {
-                addMarker: addMarker,
-                actionButtonText: actionButtonText,
-                actionButtonIcon: actionButtonIcon,
-                smartMapObject: data,
-                shouldAddMarker: true
-              }
-            };
-            this.props.smartMapRef.current?.startUserTask(userTask);
-          }
-        }
-      );
-    } else {
-      console.log("obj", this.props.selectedMapObject);
-      if (this.props.selectedMapObject) {
-        const userTask = {
-          type: SmartMapUserTaskType.NAVIGATION,
-          payload: this.props.selectedMapObject
-        };
-
-        this.props.smartMapRef.current?.startUserTask(userTask);
-      } else {
-        console.log("object is null");
-      }
-    }
-  };
-
-  getCurrentUserTask = () => {
-    this.props.smartMapRef.current?.getCurrentUserTask(
-      this.getUserTaskResponseBlock
-    );
-  };
-
-  cancelUserTask = () => {
-    this.props.smartMapRef.current?.cancelCurrentUserTask();
-  };
-
-  getMapObject = (source: SmartObjectSource) => {
-    let localRef = "";
-    switch (source) {
-      case "STATIC":
-        localRef = "R&D";
-        this.props.smartMapRef.current?.getMapObject(
-          localRef,
-          this.buildingRef,
-          source,
-          this.getMapObjectCompletionBlock
-        );
-        break;
-      case "MARKER":
-        localRef = "custom_marker_local_ref";
-        this.props.smartMapRef.current?.getMapObject(
-          localRef,
-          this.buildingRef,
-          source,
-          this.getMapObjectCompletionBlock
-        );
-        break;
-      default:
-        break;
-    }
-  };
-
-  getMapObjectByProperties = () => {
-    let title = "Lounge";
-    let properties = {
-      buildingRef: this.buildingRef,
-      title: title
-    };
-    this.props.smartMapRef.current?.getMapObjectByProperties(
-      properties,
-      this.getMapObjectCompletionBlock
-    );
-  };
-
-  getMapObjectCompletionBlock(mapObject: SmartMapObject | null) {
-    console.log("this.getMapObjectCompletionBlock", mapObject);
-  }
-
-  getUserTaskResponseBlock(userTaskResponse: SmartMapUserTaskResponse | null) {
-    console.log("this.getUserTaskResponseBlock", userTaskResponse);
-  }
-
-  setCamera = (type: "location" | "object" | "building") => {
-    const localRef = "Mobile development";
-    const cameraOptions = {
-      latitude: 60.220945577091356,
-      longitude: 24.812374723580888,
-      zoomLevel: 17,
-      bearing: 30,
-      pitch: 45,
-      floorIndex: 2,
-      buildingRef: this.buildingRef
-    };
-    if (type === "location") {
-      this.props.smartMapRef.current?.setCamera(cameraOptions);
-    } else if (type === "object") {
-      this.props.smartMapRef.current?.setCameraToObject(
-        localRef,
-        this.buildingRef,
-        21,
-        this.cameraCompletionBlock
-      );
-    } else if (type === "building") {
-      this.props.smartMapRef.current?.setCameraToBuildingRef(
-        this.buildingRef,
-        this.cameraCompletionBlock
-      );
-    }
-  };
-
-  animateCamera = (type: "location" | "object" | "building") => {
-    const localRef = "Mobile development";
-    const cameraOptions = {
-      latitude: 60.220945577091356,
-      longitude: 24.812374723580888,
-      zoomLevel: 17,
-      bearing: 30,
-      pitch: 45,
-      floorIndex: 2,
-      buildingRef: this.buildingRef
-    };
-
-    if (type === "location") {
-      this.props.smartMapRef.current?.animateCamera(cameraOptions);
-    } else if (type === "object") {
-      this.props.smartMapRef.current?.animateCameraToObject(
-        localRef,
-        this.buildingRef,
-        21,
-        this.cameraCompletionBlock
-      );
-    } else if (type === "building") {
-      this.props.smartMapRef.current?.animateCameraToBuildingRef(
-        this.buildingRef,
-        this.cameraCompletionBlock
-      );
-    }
-  };
-
-  cameraCompletionBlock(response: MapResponse) {
-    console.log("this.cameraCompletionBlock", response);
-  }
-
-  addMarker = () => {
-    console.log("this.markerMapObject ", this.markerMapObject);
-    //Either add the this.markerMapObject without the layout options
-    //this.props.smartMapRef.addMarker(this.markerMapObject)
-    //or set the layout options.
-    let markerIcon = "category_marker";
-    if (Platform.OS === "android") {
-      markerIcon = "ic_sp_category_marker";
-    }
-
-    this.props.smartMapRef.current?.addMarker(
-      this.markerMapObject,
-      Layout.BOTTOM,
-      markerIcon,
-      "#ff2f92",
-      "#fff"
-    );
-  };
-
-  removeMarker = () => {
-    this.props.smartMapRef.current?.removeMarker(this.markerMapObject);
-  };
-
-  addMarkers = () => {
-    for (let i = 0; i < this.markerData.features.length; i++) {
-      const eachMarker = this.markerData.features[i];
-      const latitude = eachMarker.geometry.coordinates[1];
-      const longitude = eachMarker.geometry.coordinates[0];
-      const floorIndex = eachMarker.properties.layerIndex;
-      const buildingRef = eachMarker.properties.buildingRef;
-      const localRef = eachMarker.properties.localRef;
-      const title = eachMarker.properties.title;
-
-      const eachSmartObject: SmartMapObject = {
-        latitude,
-        longitude,
-        floorIndex,
-        localRef,
-        buildingRef,
-        title,
-        properties: {
-          buildingRef: "",
-          css_class: "",
-          layerIndex: 1,
-          title: "Custom title"
-        },
-        source: SmartObjectSource.MARKER
-      };
-      this.markerMapObjects.push(eachSmartObject);
-    }
-    this.props.smartMapRef.current?.addMarkers(
-      this.markerMapObjects,
-      Layout.BOTTOM,
-      "category_marker_pink",
-      "#ff2f92",
-      "#fff"
-    );
-  };
-
-  removeMarkers = () => {
-    this.props.smartMapRef.current?.removeMarkers(this.markerMapObjects);
-  };
-
-  removeAllMarkers = () => {
-    this.props.smartMapRef.current?.removeAllMarkers();
-  };
-
-  selectMapObject = () => {
-    const mapObject: SmartMapObject = {
-      localRef: "Lounge",
-      buildingRef: this.buildingRef,
-      /* added start */
-      latitude: 60.220945577091356,
-      longitude: 24.812374723580888,
-      floorIndex: 2,
-      title: "Custom title",
-      properties: {
-        buildingRef: "",
-        css_class: "",
-        layerIndex: 1,
-        title: "Custom title"
-      },
-      source: SmartObjectSource.MARKER
-      /* added end */
-    };
-    this.props.smartMapRef.current?.selectMapObject(mapObject);
-  };
-
-  addGeofence = () => {
-    let localRef = "R&D";
-    if (this.hasListener === false) {
-      SmartGeofenceManager.addListener(this.handleGeofenceEntered);
-      this.hasListener = true;
-    }
-    SmartGeofenceManager.addGeofence(
-      localRef,
-      this.buildingRef,
-      (error, response) => {
-        if (error) {
-          console.error("ERROR: SmartGeofenceManager.addGeofence", error);
-        } else {
-          console.log("SmartGeofenceManager.addGeofence", response);
-        }
-      }
-    );
-  };
-
-  handleGeofenceEntered = (eventName: string, data: Record<string, string>) => {
-    console.log("handleGeofenceEntered ", eventName, data);
-  };
-
-  setWidgetPadding = () => {
-    this.props.smartMapRef.current?.setWidgetPadding(0, 0, 0, 150);
-  };
-
-  getWidgetPadding = () => {
-    this.props.smartMapRef.current?.getWidgetPadding((padding) => {
-      console.log("getPadding", padding);
-    });
-  };
-
-  resetWidgetPadding = () => {
-    this.props.smartMapRef.current?.setWidgetPadding(0, 0, 0, 0);
-  };
-
-  setGeoJson = () => {
-    const json = {
-      type: "FeatureCollection",
-      features: [
-        {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [24.8124114, 60.2209866]
-          },
-          properties: {
-            iconImage: "category_marker",
-            title: "Mobile development",
-            css_class: "",
-            localRef: "Mobile development",
-            layerIndex: 2,
-            buildingRef: "431",
-            id: ""
-          }
-        }
-      ]
-    };
-
-    console.log("setGeoJson called");
-    this.props.smartMapRef.current?.setGeoJson("marker", json, (response) => {
-      console.log("setGeoJson", response);
-    });
-  };
-
-  toggleMapMode = () => {
-    if (this.mapMode === SmartMapMode.SEARCH) {
-      this.props.smartMapRef.current?.setMapMode(SmartMapMode.MAP_ONLY);
-      this.mapMode = SmartMapMode.MAP_ONLY;
-    } else {
-      this.props.smartMapRef.current?.setMapMode(SmartMapMode.SEARCH);
-      this.mapMode = SmartMapMode.SEARCH;
-    }
-  };
-
-  clearGeoJson = () => {
-    this.props.smartMapRef.current?.setGeoJson("marker", null, (response) => {
-      console.log("clearGeoJson", response);
-    });
-  };
-
-  setLanguage = (languageCode: "en-GB" | "fi-FI" | "sv-SE" | "nb-NO") => () => {
-    SmartMapManager.setLanguage(languageCode);
-  };
-
   render() {
+    const { mapboxSDKVersion, smartSDKVersion } = this.state;
+
     return (
       <View style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
           <ScrollView>
             <View>
-              <Text>Smart SDK Version: {this.state.smartSDKVersion}</Text>
-              <Text>Mapbox Version: {this.state.mapboxSDKVersion}</Text>
+              <Text>Smart SDK Version: {smartSDKVersion}</Text>
+              <Text>Mapbox Version: {mapboxSDKVersion}</Text>
             </View>
             <Button
               title={

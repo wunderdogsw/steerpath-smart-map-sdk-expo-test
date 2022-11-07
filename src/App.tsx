@@ -4,14 +4,15 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 // import 'expo-dev-client';
 
+import { RootStackParamList } from "./Navigation";
+
 import HomeScreen from "./HomeScreen";
 import MapScreen from "./MapScreen";
 import { SteerpathProvider } from "./useSteerpath";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const App: FC = () => {
-  return (
+const App: FC = () => (
     <SteerpathProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home">
@@ -21,6 +22,5 @@ const App: FC = () => {
       </NavigationContainer>
     </SteerpathProvider>
   );
-};
 
 export default App;
