@@ -27,7 +27,7 @@ export const SteerpathProvider: FC<Props> = ({ children }) => {
         );
         SmartMapManager.startWithConfig({
           apiKey: API_KEY,
-          configFilePath: CONFIG_FILE_PATH,
+          configFilePath: CONFIG_FILE_PATH
         });
 
         SmartMapManager.setLanguage("fi-FI");

@@ -5,7 +5,7 @@ import {
   SafeAreaView,
   ScrollView,
   Text,
-  View,
+  View
 } from "react-native";
 
 import {
@@ -18,7 +18,7 @@ import {
   SmartObjectSource,
   SmartMapUserTaskResponse,
   SmartMapUserTaskType,
-  SmartMapViewMethods,
+  SmartMapViewMethods
 } from "react-native-steerpath-smart-map";
 
 interface Props {
@@ -48,9 +48,9 @@ export default class Drawer extends Component<Props, State> {
       buildingRef: "",
       css_class: "",
       layerIndex: 1,
-      title: "Custom title",
+      title: "Custom title"
     },
-    source: SmartObjectSource.MARKER,
+    source: SmartObjectSource.MARKER
   };
   mapMarkers = [];
   markerMapObjects: SmartMapObject[] = [];
@@ -63,12 +63,12 @@ export default class Drawer extends Component<Props, State> {
           buildingRef: this.buildingRef,
           layerIndex: floorIndex,
           localRef: "marker-1",
-          title: "R&D",
+          title: "R&D"
         },
         geometry: {
           type: "Point",
-          coordinates: [24.812336917966604, 60.22097943263401],
-        },
+          coordinates: [24.812336917966604, 60.22097943263401]
+        }
       },
       {
         type: "Feature",
@@ -76,12 +76,12 @@ export default class Drawer extends Component<Props, State> {
           buildingRef: this.buildingRef,
           layerIndex: floorIndex,
           localRef: "marker-2",
-          title: "Meeting Room",
+          title: "Meeting Room"
         },
         geometry: {
           type: "Point",
-          coordinates: [24.8124679144, 60.2209838483],
-        },
+          coordinates: [24.8124679144, 60.2209838483]
+        }
       },
       {
         type: "Feature",
@@ -89,14 +89,14 @@ export default class Drawer extends Component<Props, State> {
           buildingRef: this.buildingRef,
           layerIndex: floorIndex,
           localRef: "marker-3",
-          title: "Lounge",
+          title: "Lounge"
         },
         geometry: {
           type: "Point",
-          coordinates: [24.81232250109315, 60.22088118747888],
-        },
-      },
-    ],
+          coordinates: [24.81232250109315, 60.22088118747888]
+        }
+      }
+    ]
   };
   padding = [];
   mapMode = SmartMapMode.SEARCH;
@@ -106,7 +106,7 @@ export default class Drawer extends Component<Props, State> {
 
     this.state = {
       smartSDKVersion: "",
-      mapboxSDKVersion: "",
+      mapboxSDKVersion: ""
     };
   }
 
@@ -125,7 +125,7 @@ export default class Drawer extends Component<Props, State> {
       SmartMapManager.setLiveConfig({
         receive: {
           showThisDevice: false,
-          groups: [],
+          groups: []
         },
         transmit: {
           id: "Developer123",
@@ -135,9 +135,9 @@ export default class Drawer extends Component<Props, State> {
           geofences: {
             neutral: ["Neutral-Area"],
             allowed: ["Allowed-Area"],
-            forbidden: ["Forbidden-Area"],
-          },
-        },
+            forbidden: ["Forbidden-Area"]
+          }
+        }
       });
     }
 
@@ -162,8 +162,8 @@ export default class Drawer extends Component<Props, State> {
                 actionButtonText: actionButtonText,
                 actionButtonIcon: actionButtonIcon,
                 smartMapObject: data,
-                shouldAddMarker: true,
-              },
+                shouldAddMarker: true
+              }
             };
             this.props.smartMapRef.current?.startUserTask(userTask);
           }
@@ -174,7 +174,7 @@ export default class Drawer extends Component<Props, State> {
       if (this.props.selectedMapObject) {
         const userTask = {
           type: SmartMapUserTaskType.NAVIGATION,
-          payload: this.props.selectedMapObject,
+          payload: this.props.selectedMapObject
         };
 
         this.props.smartMapRef.current?.startUserTask(userTask);
@@ -224,7 +224,7 @@ export default class Drawer extends Component<Props, State> {
     let title = "Lounge";
     let properties = {
       buildingRef: this.buildingRef,
-      title: title,
+      title: title
     };
     this.props.smartMapRef.current?.getMapObjectByProperties(
       properties,
@@ -249,7 +249,7 @@ export default class Drawer extends Component<Props, State> {
       bearing: 30,
       pitch: 45,
       floorIndex: 2,
-      buildingRef: this.buildingRef,
+      buildingRef: this.buildingRef
     };
     if (type === "location") {
       this.props.smartMapRef.current?.setCamera(cameraOptions);
@@ -277,7 +277,7 @@ export default class Drawer extends Component<Props, State> {
       bearing: 30,
       pitch: 45,
       floorIndex: 2,
-      buildingRef: this.buildingRef,
+      buildingRef: this.buildingRef
     };
 
     if (type === "location") {
@@ -345,9 +345,9 @@ export default class Drawer extends Component<Props, State> {
           buildingRef: "",
           css_class: "",
           layerIndex: 1,
-          title: "Custom title",
+          title: "Custom title"
         },
-        source: SmartObjectSource.MARKER,
+        source: SmartObjectSource.MARKER
       };
       this.markerMapObjects.push(eachSmartObject);
     }
@@ -381,9 +381,9 @@ export default class Drawer extends Component<Props, State> {
         buildingRef: "",
         css_class: "",
         layerIndex: 1,
-        title: "Custom title",
+        title: "Custom title"
       },
-      source: SmartObjectSource.MARKER,
+      source: SmartObjectSource.MARKER
       /* added end */
     };
     this.props.smartMapRef.current?.selectMapObject(mapObject);
@@ -434,7 +434,7 @@ export default class Drawer extends Component<Props, State> {
           type: "Feature",
           geometry: {
             type: "Point",
-            coordinates: [24.8124114, 60.2209866],
+            coordinates: [24.8124114, 60.2209866]
           },
           properties: {
             iconImage: "category_marker",
@@ -443,10 +443,10 @@ export default class Drawer extends Component<Props, State> {
             localRef: "Mobile development",
             layerIndex: 2,
             buildingRef: "431",
-            id: "",
-          },
-        },
-      ],
+            id: ""
+          }
+        }
+      ]
     };
 
     console.log("setGeoJson called");

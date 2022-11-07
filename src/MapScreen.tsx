@@ -10,7 +10,7 @@ import {
   SmartMapUserTaskType,
   SmartMapView,
   SmartMapViewMethods,
-  SmartMapViewStatus,
+  SmartMapViewStatus
 } from "react-native-steerpath-smart-map";
 
 import { RootScreenProps } from "./Navigation";
@@ -45,13 +45,13 @@ const MapScreen: FC<RootScreenProps<"Map">> = ({ navigation }) => {
   useEffect(() => {
     if (mapLoaded && Platform.OS === "android") {
       navigation.addListener("blur", () => {
-        smartMapRef.current?.stop()
+        smartMapRef.current?.stop();
       });
 
       navigation.addListener("focus", () => {
-        smartMapRef.current?.start()
+        smartMapRef.current?.start();
       });
-    }    
+    }
   }, [mapLoaded]);
 
   const onMapLoaded = useCallback(() => {
