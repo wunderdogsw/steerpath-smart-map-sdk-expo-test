@@ -123,9 +123,7 @@ export default class Drawer extends Component<Props, State> {
 
   getCurrentUserTask = () => {
     const { smartMapRef } = this.props;
-    smartMapRef.current?.getCurrentUserTask(
-      this.getUserTaskResponseBlock
-    );
+    smartMapRef.current?.getCurrentUserTask(this.getUserTaskResponseBlock);
   };
 
   getMapObject = (source: SmartObjectSource) => {
@@ -322,9 +320,9 @@ export default class Drawer extends Component<Props, State> {
       const latitude = eachMarker.geometry.coordinates[1];
       const longitude = eachMarker.geometry.coordinates[0];
       const floorIndex = eachMarker.properties.layerIndex;
-      const {buildingRef} = eachMarker.properties;
-      const {localRef} = eachMarker.properties;
-      const {title} = eachMarker.properties;
+      const { buildingRef } = eachMarker.properties;
+      const { localRef } = eachMarker.properties;
+      const { title } = eachMarker.properties;
 
       const eachSmartObject: SmartMapObject = {
         latitude,
